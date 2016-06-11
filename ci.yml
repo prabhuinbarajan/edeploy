@@ -1,0 +1,49 @@
+- job:
+    name: eDeploy-UnitTests-YAML
+    description: 'Do not edit this job through the web!'
+    project-type: freestyle
+    properties:
+      - github:
+         url: http://github.com/prabhuinbarajan/edeploy.git 
+    block-downstream: false
+    scm:
+      - git:
+         skip-tag: True
+         url: https://github.com/prabhuinbarajan/edeploy.git
+#    triggers:
+#      - pollscm: '@hourly'
+    builders:
+      - shell: |
+          git clean -dxf
+          virtualenv venvjenkins
+          . venvjenkins/bin/activate
+          pip install pylint
+          pip install clonedigger
+          pip install nose
+          pip install pyflakes
+          pip install pytest
+          pip install pexpect
+          sloccount --duplicates --wide --details . | fgrep -v .svn > sloccount.sc || :
+          find . -name test\*.py|xargs venvjenkins/bin/nosetests --with-xunit --verbose || :
+          find . -name \*.py|egrep -v '^./tests/'|xargs venvjenkins/bin/pyflakes  > pyflakes.log || :
+          rm -f pylint.log
+          for f in `find . -name \*.py | grep -v venvjenkins|egrep -v '^./tests/'`; do
+          pylint --output-format=parseable --reports=y $f >> pylint.log
+          done || :
+          python venvjenkins/bin/clonedigger --ignore-dir=venvjenkins  --cpd-output . || :
+    publishers:
+      - warnings:
+          workspace-file-scanners:
+            - file-pattern: pyflakes.log
+              scanner: PyFlakes
+      - junit:
+          results: nosetests.xml
+      - sloccount:
+          pattern: sloccount.sc
+      - violations:
+          cpd:
+             pattern: output.xml
+          pylint:
+             pattern: pylint.log
+      - email:
+          recipients: devops@mycompany.com
