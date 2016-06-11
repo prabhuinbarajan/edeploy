@@ -66,10 +66,10 @@ def create_methods(tname, fname, cname):
 
 dirname = os.path.dirname(__file__)
 
-for fname in fnmatch.filter(os.listdir(dirname), '*.install') + \
-        ['common', 'distributions', 'functions', 'packages', 'repositories']:
-    create_methods('test_bash8', fname, 'check_bash8')
-    create_methods('test_bashn', fname, 'check_bashn')
+#for fname in fnmatch.filter(os.listdir(dirname), '*.install') + \
+#        ['common', 'distributions', 'functions', 'packages', 'repositories']:
+#    create_methods('test_bash8', fname, 'check_bash8')
+#    create_methods('test_bashn', fname, 'check_bashn')
 
 if __name__ == "__main__":
     unittest.main()
