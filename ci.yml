@@ -5,6 +5,11 @@
     properties:
       - github:
          url: http://github.com/prabhuinbarajan/edeploy.git 
+    parameters:
+      - string:
+          name: test
+          default: test
+          description: "A parameter named test, defaults to 'test'."
     block-downstream: false
     scm:
       - git:
